@@ -3,16 +3,28 @@ name: Backend Tests
 on:
   push:
     paths:
-      - 'liora-change-backend/**'
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'routes/**'
+      - 'tests/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'phpunit.xml'
       - '.github/workflows/backend-tests.yml'
   pull_request:
     paths:
-      - 'liora-change-backend/**'
+      - 'app/**'
+      - 'bootstrap/**'
+      - 'config/**'
+      - 'database/**'
+      - 'routes/**'
+      - 'tests/**'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'phpunit.xml'
       - '.github/workflows/backend-tests.yml'
-
-defaults:
-  run:
-    working-directory: liora-change-backend
 
 jobs:
   test:
@@ -40,7 +52,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('liora-change-backend/composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Composer dependencies

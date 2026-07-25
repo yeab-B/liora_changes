@@ -16,9 +16,7 @@ services:
   - type: web
     runtime: docker
     name: liora-change-backend
-    # This is a monorepo (backend lives in a subdirectory) — rootDir scopes
-    # the Docker build context/Dockerfile lookup to that subdirectory.
-   
+    # Laravel app lives at the repo root — Docker build uses ./Dockerfile.
     plan: free
     healthCheckPath: /up
     envVars:
