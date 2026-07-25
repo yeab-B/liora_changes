@@ -18,7 +18,7 @@ services:
     name: liora-change-backend
     # This is a monorepo (backend lives in a subdirectory) — rootDir scopes
     # the Docker build context/Dockerfile lookup to that subdirectory.
-    rootDir: liora-change-backend
+   
     plan: free
     healthCheckPath: /up
     envVars:
