@@ -1,0 +1,75 @@
+databases:
+  # Render has no managed MySQL — Postgres is used instead. The app already
+  # degrades gracefully on non-MySQL (see App\Services\Ai\SimpleRagRetriever
+  # and the fullText() guard in the knowledge_chunks migration), so this
+  # needs zero application code changes.
+  #
+  # NOTE: the "free" plan expires 30 days after creation (14-day grace period
+  # before deletion) — fine for a hackathon, but upgrade to a paid plan
+  # (e.g. basic-256mb) before then if you want to keep this data.
+  - name: liora-change-db
+    plan: free
+    databaseName: liora_change
+    user: liora_change
+
+services:
+  - type: web
+    runtime: docker
+    name: liora-change-backend
+    # This is a monorepo (backend lives in a subdirectory) — rootDir scopes
+    # the Docker build context/Dockerfile lookup to that subdirectory.
+    rootDir: liora-change-backend
+    plan: free
+    healthCheckPath: /up
+    envVars:
+      - key: APP_NAME
+        value: "Liora Change"
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      # Generate with `php artisan key:generate --show` and paste it in the
+      # Render dashboard — never commit the real value to git.
+      - key: APP_KEY
+        sync: false
+      # Set this to the onrender.com URL Render assigns after first deploy
+      # (Settings -> your service -> onrender.com URL), or a custom domain.
+      - key: APP_URL
+        sync: false
+
+      - key: LOG_CHANNEL
+        value: stack
+      - key: LOG_LEVEL
+        value: error
+
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_URL
+        fromDatabase:
+          name: liora-change-db
+          property: connectionString
+
+      # Database-backed session/cache/queue — no Redis service required for
+      # the MVP (matches local .env; see config/services.php).
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+
+      # Optional AI providers — leave unset (sync: false, then skip filling
+      # it in) to keep template-only fallbacks. Fill in via the Render
+      # dashboard, never commit real keys.
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: ADDIS_AI_API_KEY
+        sync: false
+      - key: ADDIS_AI_BASE_URL
+        value: https://api.addisassistant.com
+      - key: ADDIS_AI_VOICE_ID
+        value: am-hamen
+      - key: ADDIS_AI_LANGUAGE
+        value: am
