@@ -11,16 +11,18 @@ WORKDIR /var/www/html
 # spatie/laravel-permission / Postgres (Render has no managed MySQL, see
 # render.yaml — the app already degrades gracefully on non-MySQL, see
 # App\Services\Ai\SimpleRagRetriever).
+# intl is required by filament/support (composer platform check fails without it).
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        git unzip libpq-dev libzip-dev libpng-dev libjpeg-dev libonig-dev \
+        git unzip libpq-dev libzip-dev libpng-dev libjpeg-dev libonig-dev libicu-dev \
     && docker-php-ext-configure gd --with-jpeg \
-    && docker-php-ext-install pdo pdo_pgsql bcmath gd zip mbstring \
+    && docker-php-ext-configure intl \
+    && docker-php-ext-install pdo pdo_pgsql bcmath gd zip mbstring intl \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader --optimize-autoloader --no-interaction
+RUN composer install --no-dev --no-scripts --no-autoloader --no-interaction
 
 COPY . .
 
