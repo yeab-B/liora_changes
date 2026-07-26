@@ -4,7 +4,9 @@
 # talks to /api/v1/* directly, the admin panel is Filament and ships its own
 # bundled assets — see routes/web.php).
 
-FROM php:8.3-cli AS app
+# PHP 8.4+: composer.lock pins symfony/* 8.1 which requires >=8.4.1
+# (CI already runs on 8.4 — see .github/workflows/backend-tests.yml).
+FROM php:8.4-cli AS app
 WORKDIR /var/www/html
 
 # System deps + PHP extensions required by Laravel 13 / Filament 3 /
@@ -20,6 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --no-interaction
